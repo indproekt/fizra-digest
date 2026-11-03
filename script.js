@@ -7,7 +7,6 @@
     const labelTeacher = document.getElementById('labelTeacher');
     const wrapper = document.querySelector('.toggle-image-wrapper');
     const hint = document.getElementById('toggleHint');
-
     if (!toggle || !wrapper) return;
 
     const hints = {
@@ -17,12 +16,9 @@
 
     function updateToggle() {
         const isTeacher = toggle.checked;
-
         labelSurgeon.classList.toggle('active', !isTeacher);
         labelTeacher.classList.toggle('active', isTeacher);
-
         wrapper.classList.toggle('is-teacher', isTeacher);
-
         if (hint) hint.textContent = isTeacher ? hints.teacher : hints.surgeon;
     }
 
@@ -34,7 +30,6 @@
 (function() {
     const viewport = document.getElementById('carouselViewport');
     if (!viewport) return;
-
     const slides = Array.from(viewport.querySelectorAll('.carousel-slide'));
     if (!slides.length) return;
 
@@ -42,7 +37,6 @@
     const nextBtn = document.getElementById('carouselNext');
     const dotsWrap = document.getElementById('carouselDots');
     const count = slides.length;
-
     let active = 0;
     let dragStartX = null;
     let suppressClick = false;
@@ -51,11 +45,9 @@
         const dot = document.createElement('button');
         dot.type = 'button';
         dot.className = 'carousel-dot';
-
         const title = slide.querySelector('.carousel-caption-title');
         dot.setAttribute('aria-label', 'Показать: ' + (title ? title.textContent : 'Фото ' + (i + 1)));
         dot.addEventListener('click', () => goTo(i));
-
         dotsWrap.appendChild(dot);
         return dot;
     });
@@ -69,10 +61,7 @@
             let d = i - active;
             if (d > count / 2) d -= count;
             if (d < -count / 2) d += count;
-
             const distance = Math.abs(d);
-
-            // Дуга: соседние фото парят чуть выше центрального и развёрнуты к нему.
             const normalizedD = Math.min(distance / 2, 1);
             const ty = -arcHeight * Math.pow(normalizedD, 1.3);
             const ry = distance === 0 ? 0 : (d > 0 ? 16 : -16);
@@ -132,7 +121,6 @@
         }
     });
 
-    // Свайпы и перетаскивание
     viewport.addEventListener('pointerdown', (e) => {
         if (e.button !== undefined && e.button !== 0) return;
         dragStartX = e.clientX;
@@ -142,11 +130,9 @@
 
     function endDrag(e) {
         if (dragStartX === null) return;
-
         const diff = e.clientX - dragStartX;
         dragStartX = null;
         viewport.classList.remove('is-dragging');
-
         if (Math.abs(diff) > 45) {
             suppressClick = true;
             goTo(active + (diff < 0 ? 1 : -1));
@@ -160,7 +146,6 @@
     });
 
     window.addEventListener('resize', render);
-
     render();
 })();
 
@@ -172,7 +157,6 @@
     const cursorLeft = document.getElementById('cursorLeft');
     const cursorRight = document.getElementById('cursorRight');
     const status = document.getElementById('typewriterStatus');
-
     if (!notebook || !leftText || !rightText || !cursorLeft || !cursorRight) return;
 
     const leftPoem = `Забыть хочу лже-королей, бросающих словами громко,
@@ -193,40 +177,30 @@
 А также рьяных подлецов, замазкой алчной прикрытых!`;
 
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
     const leftPart = leftText.closest('.poem-part');
     const rightPart = rightText.closest('.poem-part');
-
     let timer = null;
     let hasTyped = false;
 
-    // Автоподгонка: подбираем максимальный размер шрифта, при котором текст
-    // обеих страниц целиком помещается и не наезжает на дату и подпись.
     function fitPoem() {
         if (!leftPart || !rightPart) return;
-
         leftText.textContent = leftPoem;
         rightText.textContent = rightPoem;
-
-        const baseSize = parseFloat(getComputedStyle(leftText).fontSize) || 16;
         const minSize = 8;
-        let size = baseSize;
-
+        const maxSize = window.innerWidth <= 768 ? 16 : 34;
+        let size = maxSize;
         const apply = () => {
             leftText.style.fontSize = size + 'px';
             rightText.style.fontSize = size + 'px';
         };
-
         const fits = () =>
             leftPart.scrollHeight <= leftPart.clientHeight + 1 &&
             rightPart.scrollHeight <= rightPart.clientHeight + 1;
-
         apply();
         while (size > minSize && !fits()) {
             size -= 0.5;
             apply();
         }
-
         leftText.textContent = '';
         rightText.textContent = '';
     }
@@ -245,37 +219,30 @@
             done();
             return;
         }
-
         el.textContent = text.slice(0, index);
         cursor.hidden = false;
-
         const char = text[index - 1];
         const delay = (char === '.' || char === '!' || char === '?' || char === '…') ? 10
             : char === '\n' ? 6
             : (char === ',' || char === ':' || char === ';' || char === '-') ? 5
             : 1 + Math.random() * 1.5;
-
         timer = setTimeout(() => typeChunk(el, text, index + 1, cursor, done), delay);
     }
 
-    // Печать запускается ровно один раз — при первом появлении блокнота в зоне видимости.
     function startTyping() {
         if (hasTyped) return;
         hasTyped = true;
-
         if (reduceMotion) {
             fitPoem();
             showFullText();
             return;
         }
-
         fitPoem();
         leftText.textContent = '';
         rightText.textContent = '';
         cursorLeft.hidden = false;
         cursorRight.hidden = true;
         if (status) status.textContent = '';
-
         typeChunk(leftText, leftPoem, 0, cursorLeft, () => {
             typeChunk(rightText, rightPoem, 0, cursorRight, () => {
                 cursorLeft.hidden = true;
@@ -289,7 +256,6 @@
         startTyping();
         return;
     }
-
     const observer = new IntersectionObserver((entries) => {
         entries.forEach((entry) => {
             if (!entry.isIntersecting || hasTyped) return;
@@ -301,9 +267,7 @@
         rootMargin: '0px 0px -10% 0px',
         threshold: 0.2
     });
-
     observer.observe(notebook);
-
     window.addEventListener('pagehide', () => {
         if (timer) clearTimeout(timer);
     });
@@ -313,12 +277,10 @@
 (function() {
     const sections = document.querySelectorAll('.section');
     if (!sections.length) return;
-
     if (!('IntersectionObserver' in window)) {
         sections.forEach(section => section.classList.add('visible'));
         return;
     }
-
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
@@ -331,204 +293,106 @@
         rootMargin: '0px 0px -8% 0px',
         threshold: 0.08
     });
-
     sections.forEach(section => observer.observe(section));
 })();
 
-// --- 5. Photo Gallery with Lightbox ---
+// --- 5. Gallery Generation (by sections, without captions) ---
 (function() {
-    const galleryGrid = document.getElementById('galleryGrid');
-    if (!galleryGrid) return;
-
-    const captions = {
-        1: 'Студенты и преподаватель',
-        2: 'Вместе со студентами',
-        3: 'Активности на перемене',
-        4: 'Бадминтон после пар',
-        5: 'Педагогическое образование',
-        6: 'Сборная по волейболу',
-        7: 'На корте с ракеткой',
-        8: 'Награда за труд',
-        9: 'Занятие в спортивном зале',
-        10: 'Помощь на тренировке',
-        11: 'Медали студенческого клуба',
-        12: 'На выставке «Дон спортивный»',
-        13: 'Педагогический стенд',
-        14: 'Подача на занятии',
-        15: 'Класс в полном составе',
-        16: 'Профориентационное мероприятие',
-        17: 'Слёт студенческих клубов',
-        18: 'Форум «Путь к Олимпу»',
-        19: 'Разминка под ГТО',
-        20: 'Отработка первой помощи',
-        21: '«Лыжня России 2024»',
-        22: 'Призёр «Лыжни России»',
-        23: 'Команда на «Лыжне России»',
-        24: 'Церемония награждения',
-        25: 'Научный журнал: публикация',
-        26: 'Страница научной статьи',
-        27: 'Урок физкультуры',
-        28: 'Стихотворение в блокноте'
+    const sections = {
+        galleryTogether: [
+            { src: 'images/photo_2026-10-31_15-56-25.jpg', alt: 'Юлия Александровна со студентами' },
+            { src: 'images/photo_2026-10-31_16-56-32.jpg', alt: 'Занятие со студентами' },
+            { src: 'images/photo_2026-11-03_10-24-43.jpg', alt: 'Вместе со студентами' },
+            { src: 'images/photo_2026-11-03_10-24-44.jpg', alt: 'Студенты и преподаватель' }
+        ],
+        galleryHobby: [
+            { src: 'images/photo_2026-10-31_16-05-08.jpg', alt: 'Бадминтон после пар' },
+            { src: 'images/photo_2026-10-31_16-05-09.jpg', alt: 'За любимым делом' }
+        ],
+        galleryEvents: [
+            { src: 'images/photo_2026-10-31_15-56-25.jpg', alt: 'Соревнования' },
+            { src: 'images/photo_2026-10-31_16-05-07.jpg', alt: 'Спортивное мероприятие' },
+            { src: 'images/photo_2026-10-31_16-06-09.jpg', alt: 'Соревнования и мероприятия' },
+            { src: 'images/photo_2026-11-03_10-29-29.jpg', alt: 'Мероприятие' },
+            { src: 'images/photo_2026-11-03_10-29-30.jpg', alt: 'Соревнования' }
+        ]
     };
 
-    const galleryPhotos = [];
-    for (let i = 1; i <= 28; i++) {
-        galleryPhotos.push({
-            src: `images/photo_${i}_2026-11-01_01-16-25.jpg`,
-            alt: captions[i] || `Фото ${i}`,
-            caption: captions[i] || `Фото ${i}`
+    Object.keys(sections).forEach(containerId => {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+        sections[containerId].forEach(photo => {
+            const item = document.createElement('div');
+            item.className = 'gallery-item';
+            item.innerHTML = `
+                <img src="${photo.src}" alt="${photo.alt}" loading="lazy">
+            `;
+            container.appendChild(item);
         });
-    }
-
-    const fragment = document.createDocumentFragment();
-
-    galleryPhotos.forEach((photo, index) => {
-        const item = document.createElement('button');
-        item.type = 'button';
-        item.className = 'gallery-item';
-        item.dataset.index = String(index);
-        item.setAttribute('aria-label', `Открыть фото: ${photo.caption}`);
-
-        const img = document.createElement('img');
-        img.src = photo.src;
-        img.alt = photo.alt;
-        img.loading = 'lazy';
-        img.decoding = 'async';
-
-        const overlay = document.createElement('div');
-        overlay.className = 'gallery-overlay';
-
-        const caption = document.createElement('span');
-        caption.className = 'gallery-caption';
-        caption.textContent = photo.caption;
-
-        overlay.appendChild(caption);
-        item.appendChild(img);
-        item.appendChild(overlay);
-        fragment.appendChild(item);
     });
+})();
 
-    galleryGrid.appendChild(fragment);
-
-    // Lightbox
-    const lightbox = document.createElement('div');
-    lightbox.className = 'lightbox';
-    lightbox.setAttribute('role', 'dialog');
-    lightbox.setAttribute('aria-modal', 'true');
-    lightbox.setAttribute('aria-label', 'Просмотр фотографий');
-    lightbox.innerHTML = `
-        <button class="lightbox-close" type="button" aria-label="Закрыть">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                <line x1="18" y1="6" x2="6" y2="18"></line>
-                <line x1="6" y1="6" x2="18" y2="18"></line>
-            </svg>
-        </button>
-        <button class="lightbox-nav lightbox-prev" type="button" aria-label="Предыдущее фото">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                <polyline points="15 18 9 12 15 6"></polyline>
-            </svg>
-        </button>
-        <button class="lightbox-nav lightbox-next" type="button" aria-label="Следующее фото">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                <polyline points="9 18 15 12 9 6"></polyline>
-            </svg>
-        </button>
-        <div class="lightbox-content"></div>
-        <div class="lightbox-counter" aria-live="polite"></div>
-    `;
-    document.body.appendChild(lightbox);
-
-    const lightboxContent = lightbox.querySelector('.lightbox-content');
-    const lightboxCounter = lightbox.querySelector('.lightbox-counter');
-    const lightboxClose = lightbox.querySelector('.lightbox-close');
-    const lightboxPrev = lightbox.querySelector('.lightbox-prev');
-    const lightboxNext = lightbox.querySelector('.lightbox-next');
-    const items = galleryGrid.querySelectorAll('.gallery-item');
-
-    let currentIndex = 0;
-    let lastFocused = null;
-
-    function renderSlide(index) {
-        const photo = galleryPhotos[index];
-        lightboxContent.innerHTML = '';
-
-        const img = document.createElement('img');
-        img.src = photo.src;
-        img.alt = photo.alt;
-        lightboxContent.appendChild(img);
-
-        lightboxCounter.textContent = `${index + 1} / ${galleryPhotos.length} · ${photo.caption}`;
-    }
-
-    function openLightbox(index) {
-        currentIndex = index;
-        lastFocused = document.activeElement;
-        renderSlide(currentIndex);
-        lightbox.classList.add('open');
-        document.body.style.overflow = 'hidden';
-        lightboxClose.focus();
-    }
+// --- 6. Gallery Lightbox ---
+(function() {
+    const galleryImgs = document.querySelectorAll('.gallery-item img');
+    const lightbox = document.getElementById('lightbox');
+    if (!lightbox || !galleryImgs.length) return;
+    const lightboxImg = lightbox.querySelector('.lightbox-img');
+    const closeBtn = lightbox.querySelector('.close-lightbox');
+    if (!lightboxImg || !closeBtn) return;
 
     function closeLightbox() {
-        lightbox.classList.remove('open');
+        lightbox.classList.remove('active');
+        document.body.style.paddingRight = '';
         document.body.style.overflow = '';
-        if (lastFocused && typeof lastFocused.focus === 'function') {
-            lastFocused.focus();
-        }
     }
 
-    function navigate(direction) {
-        currentIndex = (currentIndex + direction + galleryPhotos.length) % galleryPhotos.length;
-        renderSlide(currentIndex);
-    }
-
-    items.forEach((item, index) => {
-        item.addEventListener('click', () => openLightbox(index));
+    galleryImgs.forEach(img => {
+        img.addEventListener('click', () => {
+            lightboxImg.src = img.currentSrc || img.src;
+            lightboxImg.alt = img.alt || 'Увеличенное фото';
+            const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+            document.body.style.paddingRight = `${scrollbarWidth}px`;
+            document.body.style.overflow = 'hidden';
+            lightbox.classList.add('active');
+        });
     });
 
-    lightboxClose.addEventListener('click', closeLightbox);
-    lightboxPrev.addEventListener('click', () => navigate(-1));
-    lightboxNext.addEventListener('click', () => navigate(1));
-
-    lightbox.addEventListener('click', (e) => {
-        if (e.target === lightbox) closeLightbox();
+    closeBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        closeLightbox();
     });
-
+    lightbox.addEventListener('click', closeLightbox);
     document.addEventListener('keydown', (e) => {
-        if (!lightbox.classList.contains('open')) return;
-
-        if (e.key === 'Escape') {
+        if (e.key === 'Escape' && lightbox.classList.contains('active')) {
             closeLightbox();
-        } else if (e.key === 'ArrowLeft') {
-            navigate(-1);
-        } else if (e.key === 'ArrowRight') {
-            navigate(1);
-        } else if (e.key === 'Tab') {
-            // Небольшая ловушка фокуса внутри лайтбокса
-            const focusable = [lightboxClose, lightboxPrev, lightboxNext];
-            const first = focusable[0];
-            const last = focusable[focusable.length - 1];
-
-            if (e.shiftKey && document.activeElement === first) {
-                e.preventDefault();
-                last.focus();
-            } else if (!e.shiftKey && document.activeElement === last) {
-                e.preventDefault();
-                first.focus();
-            }
         }
     });
+})();
 
-    // Свайпы на мобильных
-    let touchStartX = 0;
-    lightbox.addEventListener('touchstart', (e) => {
-        touchStartX = e.touches[0].clientX;
-    }, { passive: true });
+// --- 7. Interactive floating particles background ---
+(function() {
+    const layer = document.getElementById('particlesLayer');
+    if (!layer) return;
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-    lightbox.addEventListener('touchend', (e) => {
-        const diff = touchStartX - e.changedTouches[0].clientX;
-        if (Math.abs(diff) > 50) {
-            navigate(diff > 0 ? 1 : -1);
-        }
-    }, { passive: true });
+    const count = 28;
+    const fragment = document.createDocumentFragment();
+    for (let i = 0; i < count; i++) {
+        const particle = document.createElement('span');
+        particle.className = 'particle';
+        const size = 6 + Math.random() * 4;
+        const duration = 14 + Math.random() * 14;
+        const delay = -Math.random() * duration;
+        const drift = (Math.random() * 2 - 1) * 70;
+        particle.style.left = (Math.random() * 100).toFixed(2) + '%';
+        particle.style.width = size.toFixed(1) + 'px';
+        particle.style.height = size.toFixed(1) + 'px';
+        particle.style.animationDuration = duration.toFixed(1) + 's';
+        particle.style.animationDelay = delay.toFixed(1) + 's';
+        particle.style.setProperty('--particle-drift', drift.toFixed(1) + 'px');
+        particle.style.setProperty('--particle-opacity', (0.5 + Math.random() * 0.2).toFixed(2));
+        fragment.appendChild(particle);
+    }
+    layer.appendChild(fragment);
 })();
