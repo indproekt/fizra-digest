@@ -449,6 +449,7 @@ ul { list-style: none; }
   aspect-ratio: 4 / 3;
   box-shadow: 0 10px 28px -10px var(--color-shadow);
   background: #e6e9ee;
+  cursor: pointer;
 }
 .achievements-photo img {
   width: 100%; height: 100%;
@@ -463,6 +464,50 @@ ul { list-style: none; }
   font-family: var(--font-heading);
   font-weight: 500; color: #fff;
   background: linear-gradient(transparent, rgba(12, 20, 16, 0.75));
+}
+
+/* ===== EVIDENCE SECTION (подтверждение участия) ===== */
+.evidence-section {
+  padding: var(--spacing-xl) 0;
+}
+.evidence-wrapper {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-lg);
+  align-items: center;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+.evidence-text p {
+  font-size: 1rem;
+  color: var(--color-text-light);
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+.evidence-link {
+  display: inline-block;
+  color: var(--color-lime);
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.evidence-link:hover {
+  color: var(--color-lime-soft);
+}
+.evidence-screenshots {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-md);
+}
+.evidence-screenshots img {
+  width: 100%;
+  max-width: 420px; /* было без ограничения — теперь чуть крупнее */
+  margin: 0 auto;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 12px 32px -10px var(--color-shadow-strong);
+  border: none; /* убираем белую обводку */
+  cursor: pointer;
 }
 
 /* ===== ARTICLE SECTION ===== */
@@ -487,14 +532,18 @@ ul { list-style: none; }
   overflow: hidden;
   box-shadow: 0 10px 28px -10px var(--color-shadow);
   background: #e6e9ee;
+  cursor: pointer;
 }
 .article-photo img {
   width: 100%; height: auto;
   object-fit: cover;
-  transition: transform var(--transition-slow);
+  transition: transform var(--transition-slow), filter var(--transition-normal);
   transform: scale(1.05);
 }
-.article-photo:hover img { transform: scale(1.1); }
+.article-photo:hover img { 
+  transform: scale(1.1); 
+  filter: brightness(1.05);
+}
 
 /* ===== MENTOR SECTION ===== */
 .mentor-content {
@@ -526,6 +575,11 @@ ul { list-style: none; }
   color: var(--color-text-light);
   line-height: 1.8;
   margin-bottom: var(--spacing-md);
+}
+.mentor-text p em {
+  font-style: italic;
+  color: var(--color-lime);
+  font-weight: 500;
 }
 .mentor-points { display: grid; gap: 0.75rem; }
 .mentor-points li {
@@ -970,8 +1024,9 @@ ul { list-style: none; }
   .achievements-grid { grid-template-columns: 1fr; max-width: 440px; margin: 0 auto; }
   .achievements-strip { grid-template-columns: 1fr 1fr; }
   .achievements-strip .achievements-photo:last-child { grid-column: 1 / -1; aspect-ratio: 16 / 9; }
-  .path-content, .mentor-content, .article-content { grid-template-columns: 1fr; gap: var(--spacing-lg); }
+  .path-content, .mentor-content, .article-content, .evidence-wrapper { grid-template-columns: 1fr; gap: var(--spacing-lg); }
   .mentor-gallery { max-width: 640px; margin: 0 auto; width: 100%; }
+  .evidence-screenshots { grid-template-columns: 1fr 1fr; }
 }
 
 @media (max-width: 768px) {
@@ -1012,7 +1067,7 @@ ul { list-style: none; }
   .close-lightbox { top: 12px; right: 20px; font-size: 34px; }
 
   /* Мобильная читаемость — белые рамки для текста */
-  .intro-text, .path-text, .mentor-text, .hobbies-intro, .article-text {
+  .intro-text, .path-text, .mentor-text, .hobbies-intro, .article-text, .evidence-text {
     background: rgba(255, 255, 255, 0.95);
     color: #1a2b3a;
     padding: 1.5rem 1.25rem;
@@ -1020,8 +1075,11 @@ ul { list-style: none; }
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
     text-shadow: none;
   }
-  .intro-text p, .path-text p, .mentor-text p, .hobbies-intro p, .article-text p {
+  .intro-text p, .path-text p, .mentor-text p, .hobbies-intro p, .article-text p, .evidence-text p {
     color: #1a2b3a; font-weight: 500;
+  }
+  .mentor-text p em {
+    color: #27ae60; /* тёмно-зелёный — читается на белом фоне */
   }
   .hero-meta {
     background: rgba(255, 255, 255, 0.95);
@@ -1030,6 +1088,10 @@ ul { list-style: none; }
     text-align: center;
   }
   .hero-meta strong { color: #27ae60; }
+  .evidence-link { color: #27ae60; }
+  .evidence-screenshots img { border: none; }
+  /* На мобильном скриншоты остаются в ряд */
+  .evidence-screenshots { grid-template-columns: 1fr 1fr; }
 
   .toggle-container {
     background: rgba(240, 244, 248, 0.8);
@@ -1062,6 +1124,8 @@ ul { list-style: none; }
   .carousel-viewport { height: 360px; }
   .carousel-controls { gap: var(--spacing-sm); }
   .blitz-grid { grid-template-columns: 1fr; }
+  /* На совсем маленьких экранах скриншоты в колонку */
+  .evidence-screenshots { grid-template-columns: 1fr; }
 }
 
 /* ===== REDUCED MOTION ===== */
