@@ -334,7 +334,7 @@
 
 // --- 6. Gallery Lightbox ---
 (function() {
-    const galleryImgs = document.querySelectorAll('.gallery-item img');
+const galleryImgs = document.querySelectorAll('.gallery-item img, .achievements-photo img, .article-photo img');
     const lightbox = document.getElementById('lightbox');
     if (!lightbox || !galleryImgs.length) return;
     const lightboxImg = lightbox.querySelector('.lightbox-img');
